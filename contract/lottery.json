@@ -1,0 +1,1830 @@
+{
+  "source": {
+    "hash": "0x8131de2f7d9631d87a43f412d2f5822351793e5b3d3ad2893171917071dc45e3",
+    "language": "ink! 5.1.1",
+    "compiler": "rustc 1.91.0",
+    "build_info": {
+      "build_mode": "Release",
+      "cargo_contract_version": "3.2.0",
+      "rust_toolchain": "stable-x86_64-unknown-linux-gnu",
+      "wasm_opt_settings": {
+        "keep_debug_symbols": false,
+        "optimization_passes": "Z"
+      }
+    }
+  },
+  "contract": {
+    "name": "lottery",
+    "version": "0.1.0",
+    "authors": [
+      "[your_name] <[your_email]>"
+    ]
+  },
+  "spec": {
+    "constructors": [
+      {
+        "args": [
+          {
+            "label": "asset_id",
+            "type": {
+              "displayName": [
+                "u128"
+              ],
+              "type": 3
+            }
+          },
+          {
+            "label": "starting_block",
+            "type": {
+              "displayName": [
+                "u32"
+              ],
+              "type": 4
+            }
+          },
+          {
+            "label": "daily_total_blocks",
+            "type": {
+              "displayName": [
+                "u32"
+              ],
+              "type": 4
+            }
+          },
+          {
+            "label": "maximum_draws",
+            "type": {
+              "displayName": [
+                "u8"
+              ],
+              "type": 2
+            }
+          },
+          {
+            "label": "maximum_bets",
+            "type": {
+              "displayName": [
+                "u16"
+              ],
+              "type": 5
+            }
+          },
+          {
+            "label": "init_start",
+            "type": {
+              "displayName": [
+                "bool"
+              ],
+              "type": 6
+            }
+          }
+        ],
+        "default": false,
+        "docs": [
+          "Lottery setup",
+          "-------------",
+          "Setup, start and stop the lottery",
+          "Constructor"
+        ],
+        "label": "new",
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink_primitives",
+            "ConstructorResult"
+          ],
+          "type": 18
+        },
+        "selector": "0x9bae9d5e"
+      },
+      {
+        "args": [],
+        "default": false,
+        "docs": [
+          "Make a default instantiation"
+        ],
+        "label": "default",
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink_primitives",
+            "ConstructorResult"
+          ],
+          "type": 18
+        },
+        "selector": "0xed4b9d1b"
+      }
+    ],
+    "docs": [],
+    "environment": {
+      "accountId": {
+        "displayName": [
+          "AccountId"
+        ],
+        "type": 0
+      },
+      "balance": {
+        "displayName": [
+          "Balance"
+        ],
+        "type": 3
+      },
+      "blockNumber": {
+        "displayName": [
+          "BlockNumber"
+        ],
+        "type": 4
+      },
+      "chainExtension": {
+        "displayName": [
+          "ChainExtension"
+        ],
+        "type": 34
+      },
+      "hash": {
+        "displayName": [
+          "Hash"
+        ],
+        "type": 33
+      },
+      "maxEventTopics": 4,
+      "staticBufferSize": 16384,
+      "timestamp": {
+        "displayName": [
+          "Timestamp"
+        ],
+        "type": 15
+      }
+    },
+    "events": [
+      {
+        "args": [
+          {
+            "docs": [],
+            "indexed": true,
+            "label": "operator",
+            "type": {
+              "displayName": [
+                "AccountId"
+              ],
+              "type": 0
+            }
+          },
+          {
+            "docs": [],
+            "indexed": false,
+            "label": "status",
+            "type": {
+              "displayName": [
+                "LotteryStatus"
+              ],
+              "type": 31
+            }
+          }
+        ],
+        "docs": [
+          "Contract event emitter"
+        ],
+        "label": "LotteryEvent",
+        "module_path": "lottery::lottery",
+        "signature_topic": "0x784b9e84c0240bbbd688ddfd055054225429280038b3e6317ca785efe420ced7"
+      }
+    ],
+    "lang_error": {
+      "displayName": [
+        "ink",
+        "LangError"
+      ],
+      "type": 20
+    },
+    "messages": [
+      {
+        "args": [
+          {
+            "label": "operator",
+            "type": {
+              "displayName": [
+                "AccountId"
+              ],
+              "type": 0
+            }
+          },
+          {
+            "label": "asset_id",
+            "type": {
+              "displayName": [
+                "u128"
+              ],
+              "type": 3
+            }
+          },
+          {
+            "label": "starting_block",
+            "type": {
+              "displayName": [
+                "u32"
+              ],
+              "type": 4
+            }
+          },
+          {
+            "label": "daily_total_blocks",
+            "type": {
+              "displayName": [
+                "u32"
+              ],
+              "type": 4
+            }
+          },
+          {
+            "label": "maximum_draws",
+            "type": {
+              "displayName": [
+                "u8"
+              ],
+              "type": 2
+            }
+          },
+          {
+            "label": "maximum_bets",
+            "type": {
+              "displayName": [
+                "u16"
+              ],
+              "type": 5
+            }
+          }
+        ],
+        "default": false,
+        "docs": [
+          " Only the dev can setup the lottery smart contract"
+        ],
+        "label": "setup",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 21
+        },
+        "selector": "0x86a08581"
+      },
+      {
+        "args": [],
+        "default": false,
+        "docs": [
+          " Start the lottery",
+          " ",
+          " 1. Only the operator can start the lottery",
+          " 2. The current block must be greater than the starting block"
+        ],
+        "label": "start",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 21
+        },
+        "selector": "0x3c1e3986"
+      },
+      {
+        "args": [],
+        "default": false,
+        "docs": [
+          " Stop the lottery",
+          " ",
+          " 1. The lottery can be stop only if all draws are closed",
+          " 2. Stopping the lottery if the block passes the starting block is also invalid.",
+          "    You must correct the setup of the lottery before stopping.",
+          " 3. Only the operator can stop the lottery.",
+          " 4. "
+        ],
+        "label": "stop",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 21
+        },
+        "selector": "0x9e319d78"
+      },
+      {
+        "args": [
+          {
+            "label": "opening_blocks",
+            "type": {
+              "displayName": [
+                "u32"
+              ],
+              "type": 4
+            }
+          },
+          {
+            "label": "processing_blocks",
+            "type": {
+              "displayName": [
+                "u32"
+              ],
+              "type": 4
+            }
+          },
+          {
+            "label": "closing_blocks",
+            "type": {
+              "displayName": [
+                "u32"
+              ],
+              "type": 4
+            }
+          },
+          {
+            "label": "bet_amount",
+            "type": {
+              "displayName": [
+                "u128"
+              ],
+              "type": 3
+            }
+          }
+        ],
+        "default": false,
+        "docs": [
+          " Lottery draws",
+          " -------------",
+          " All functions related to draws",
+          " Add draw:",
+          " ",
+          " 1. Only the operator can add a draw.",
+          " 2. The draw can only be added if the lottery is stopped.",
+          " 3. It must be important that the following hierarchy of value must be followed.",
+          "    lottery.daily_total_blocks > closing_blocks > processing_blocks > opening_blocks"
+        ],
+        "label": "add_draw",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 21
+        },
+        "selector": "0x07fd46b5"
+      },
+      {
+        "args": [],
+        "default": false,
+        "docs": [
+          " Remove draw:",
+          " ",
+          " 1. Only the operator can remove a draw.",
+          " 2. The lottery must be stopped before removing a draw.",
+          " 3. The removal is last-in-first-out sequence"
+        ],
+        "label": "remove_draw",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 21
+        },
+        "selector": "0xf56f44ab"
+      },
+      {
+        "args": [
+          {
+            "label": "draw_number",
+            "type": {
+              "displayName": [
+                "u32"
+              ],
+              "type": 4
+            }
+          }
+        ],
+        "default": false,
+        "docs": [
+          " Open draw",
+          " ",
+          " 1. Only the operator can open a draw",
+          " 2. The draw status must be close and the is_open flag must be false before",
+          "    you can open a draw.",
+          " 3. The block number must be greater than the lottery starting block plus the",
+          "    draw blocks opening."
+        ],
+        "label": "open_draw",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 21
+        },
+        "selector": "0x925196a4"
+      },
+      {
+        "args": [
+          {
+            "label": "draw_number",
+            "type": {
+              "displayName": [
+                "u32"
+              ],
+              "type": 4
+            }
+          }
+        ],
+        "default": false,
+        "docs": [
+          " Process draw",
+          " ",
+          " 1. Processing means that stopping the lottery draw in accepting bets.",
+          " 2. At the same time it calculates in random the winning number.",
+          " 3. It will also gives the operator the opportunity to override the winning ",
+          "    number.",
+          " 4. It will also checks of the current block is greater than the sum of the",
+          "    lottery starting block and the processing blocks of the draw."
+        ],
+        "label": "process_draw",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 21
+        },
+        "selector": "0xae3a3ba5"
+      },
+      {
+        "args": [
+          {
+            "label": "draw_number",
+            "type": {
+              "displayName": [
+                "u32"
+              ],
+              "type": 4
+            }
+          },
+          {
+            "label": "winning_number",
+            "type": {
+              "displayName": [
+                "u16"
+              ],
+              "type": 5
+            }
+          }
+        ],
+        "default": false,
+        "docs": [
+          " Override draw",
+          " ",
+          " 1. The operator can override the winning number of the draw during the processing period."
+        ],
+        "label": "override_draw",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 21
+        },
+        "selector": "0xb6c2b472"
+      },
+      {
+        "args": [
+          {
+            "label": "draw_number",
+            "type": {
+              "displayName": [
+                "u32"
+              ],
+              "type": 4
+            }
+          }
+        ],
+        "default": false,
+        "docs": [
+          " Close draw",
+          " ",
+          " 1. Only the operator can close the draw.",
+          " 2. Only processed draws can be closed.",
+          " 3. The block number must be greater than the lottery starting block plus the",
+          "    draw blocks closing.",
+          " 4. The closing of the draw calls on the following process:",
+          "    4.1. Search for the winners",
+          "    4.2. Calculate the shares of the jackpot and upline percentage.  Only given",
+          "         to upline that bets on the current draw.",
+          "    4.3. Transfer the balance to the bettors and its upline who actively bets",
+          "    4.4. Update the status of the draw.",
+          "    4.5. Delete all bets",
+          " 5. During only this period (closing) the app should display the winning number"
+        ],
+        "label": "close_draw",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 24
+        },
+        "selector": "0x74f46aa4"
+      },
+      {
+        "args": [
+          {
+            "label": "draw_number",
+            "type": {
+              "displayName": [
+                "u32"
+              ],
+              "type": 4
+            }
+          },
+          {
+            "label": "bet_number",
+            "type": {
+              "displayName": [
+                "u16"
+              ],
+              "type": 5
+            }
+          },
+          {
+            "label": "bettor",
+            "type": {
+              "displayName": [
+                "AccountId"
+              ],
+              "type": 0
+            }
+          },
+          {
+            "label": "upline",
+            "type": {
+              "displayName": [
+                "AccountId"
+              ],
+              "type": 0
+            }
+          },
+          {
+            "label": "tx_hash",
+            "type": {
+              "displayName": [
+                "Vec"
+              ],
+              "type": 11
+            }
+          }
+        ],
+        "default": false,
+        "docs": [
+          " Bets",
+          " ----",
+          " All functions related to bets.",
+          " Add a bet",
+          " ",
+          " 1. Anyone can place a bet on an open draw",
+          " 2. Upon betting the bet amount is already distributed and transferred to the following:",
+          "    2.1. 50% will go to the jackpot where it will be split into the following:",
+          "         2.1.1. Jackpot share is 90%",
+          "         2.1.2. Upline share of the jackpot is 10%",
+          "    2.2. 20% will go to the operator",
+          "    2.3. 10% will go to the developer",
+          "    2.4. 10% will go to the rebate (all bettors)",
+          "    2.5. 10% will go to the affiliate (immediately the active upline will get 10%)"
+        ],
+        "label": "add_bet",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 24
+        },
+        "selector": "0x65ee8aaa"
+      },
+      {
+        "args": [],
+        "default": false,
+        "docs": [
+          " Getter functions",
+          " ",
+          " These functions returns storage data ",
+          " Returns lottery setup"
+        ],
+        "label": "get_lottery_setup",
+        "mutates": false,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 28
+        },
+        "selector": "0xfd9c771e"
+      },
+      {
+        "args": [],
+        "default": false,
+        "docs": [
+          " Return all the draws"
+        ],
+        "label": "get_draws",
+        "mutates": false,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 29
+        },
+        "selector": "0xbe5d3db5"
+      },
+      {
+        "args": [
+          {
+            "label": "draw_number",
+            "type": {
+              "displayName": [
+                "u32"
+              ],
+              "type": 4
+            }
+          }
+        ],
+        "default": false,
+        "docs": [
+          " Return all the bets"
+        ],
+        "label": "get_bets",
+        "mutates": false,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 30
+        },
+        "selector": "0xd1e38ef8"
+      }
+    ]
+  },
+  "storage": {
+    "root": {
+      "layout": {
+        "struct": {
+          "fields": [
+            {
+              "layout": {
+                "struct": {
+                  "fields": [
+                    {
+                      "layout": {
+                        "leaf": {
+                          "key": "0x00000000",
+                          "ty": 0
+                        }
+                      },
+                      "name": "operator"
+                    },
+                    {
+                      "layout": {
+                        "leaf": {
+                          "key": "0x00000000",
+                          "ty": 0
+                        }
+                      },
+                      "name": "dev"
+                    },
+                    {
+                      "layout": {
+                        "leaf": {
+                          "key": "0x00000000",
+                          "ty": 3
+                        }
+                      },
+                      "name": "asset_id"
+                    },
+                    {
+                      "layout": {
+                        "leaf": {
+                          "key": "0x00000000",
+                          "ty": 4
+                        }
+                      },
+                      "name": "starting_block"
+                    },
+                    {
+                      "layout": {
+                        "leaf": {
+                          "key": "0x00000000",
+                          "ty": 4
+                        }
+                      },
+                      "name": "daily_total_blocks"
+                    },
+                    {
+                      "layout": {
+                        "leaf": {
+                          "key": "0x00000000",
+                          "ty": 4
+                        }
+                      },
+                      "name": "next_starting_block"
+                    },
+                    {
+                      "layout": {
+                        "leaf": {
+                          "key": "0x00000000",
+                          "ty": 2
+                        }
+                      },
+                      "name": "maximum_draws"
+                    },
+                    {
+                      "layout": {
+                        "leaf": {
+                          "key": "0x00000000",
+                          "ty": 5
+                        }
+                      },
+                      "name": "maximum_bets"
+                    },
+                    {
+                      "layout": {
+                        "leaf": {
+                          "key": "0x00000000",
+                          "ty": 6
+                        }
+                      },
+                      "name": "is_started"
+                    }
+                  ],
+                  "name": "LotterySetup"
+                }
+              },
+              "name": "lottery_setup"
+            },
+            {
+              "layout": {
+                "leaf": {
+                  "key": "0x00000000",
+                  "ty": 7
+                }
+              },
+              "name": "draws"
+            },
+            {
+              "layout": {
+                "leaf": {
+                  "key": "0x00000000",
+                  "ty": 15
+                }
+              },
+              "name": "salt"
+            }
+          ],
+          "name": "Lottery"
+        }
+      },
+      "root_key": "0x00000000",
+      "ty": 16
+    }
+  },
+  "types": [
+    {
+      "id": 0,
+      "type": {
+        "def": {
+          "composite": {
+            "fields": [
+              {
+                "type": 1,
+                "typeName": "[u8; 32]"
+              }
+            ]
+          }
+        },
+        "path": [
+          "ink_primitives",
+          "types",
+          "AccountId"
+        ]
+      }
+    },
+    {
+      "id": 1,
+      "type": {
+        "def": {
+          "array": {
+            "len": 32,
+            "type": 2
+          }
+        }
+      }
+    },
+    {
+      "id": 2,
+      "type": {
+        "def": {
+          "primitive": "u8"
+        }
+      }
+    },
+    {
+      "id": 3,
+      "type": {
+        "def": {
+          "primitive": "u128"
+        }
+      }
+    },
+    {
+      "id": 4,
+      "type": {
+        "def": {
+          "primitive": "u32"
+        }
+      }
+    },
+    {
+      "id": 5,
+      "type": {
+        "def": {
+          "primitive": "u16"
+        }
+      }
+    },
+    {
+      "id": 6,
+      "type": {
+        "def": {
+          "primitive": "bool"
+        }
+      }
+    },
+    {
+      "id": 7,
+      "type": {
+        "def": {
+          "sequence": {
+            "type": 8
+          }
+        }
+      }
+    },
+    {
+      "id": 8,
+      "type": {
+        "def": {
+          "composite": {
+            "fields": [
+              {
+                "name": "draw_number",
+                "type": 4,
+                "typeName": "u32"
+              },
+              {
+                "name": "opening_blocks",
+                "type": 4,
+                "typeName": "u32"
+              },
+              {
+                "name": "processing_blocks",
+                "type": 4,
+                "typeName": "u32"
+              },
+              {
+                "name": "closing_blocks",
+                "type": 4,
+                "typeName": "u32"
+              },
+              {
+                "name": "bet_amount",
+                "type": 3,
+                "typeName": "u128"
+              },
+              {
+                "name": "jackpot",
+                "type": 3,
+                "typeName": "u128"
+              },
+              {
+                "name": "rebate",
+                "type": 3,
+                "typeName": "u128"
+              },
+              {
+                "name": "bets",
+                "type": 9,
+                "typeName": "Vec<Bet>"
+              },
+              {
+                "name": "winning_number",
+                "type": 5,
+                "typeName": "u16"
+              },
+              {
+                "name": "winners",
+                "type": 12,
+                "typeName": "Vec<Winner>"
+              },
+              {
+                "name": "status",
+                "type": 14,
+                "typeName": "DrawStatus"
+              },
+              {
+                "name": "is_open",
+                "type": 6,
+                "typeName": "bool"
+              }
+            ]
+          }
+        },
+        "path": [
+          "lottery",
+          "lottery",
+          "Draw"
+        ]
+      }
+    },
+    {
+      "id": 9,
+      "type": {
+        "def": {
+          "sequence": {
+            "type": 10
+          }
+        }
+      }
+    },
+    {
+      "id": 10,
+      "type": {
+        "def": {
+          "composite": {
+            "fields": [
+              {
+                "name": "bettor",
+                "type": 0,
+                "typeName": "AccountId"
+              },
+              {
+                "name": "upline",
+                "type": 0,
+                "typeName": "AccountId"
+              },
+              {
+                "name": "bet_number",
+                "type": 5,
+                "typeName": "u16"
+              },
+              {
+                "name": "tx_hash",
+                "type": 11,
+                "typeName": "Vec<u8>"
+              }
+            ]
+          }
+        },
+        "path": [
+          "lottery",
+          "lottery",
+          "Bet"
+        ]
+      }
+    },
+    {
+      "id": 11,
+      "type": {
+        "def": {
+          "sequence": {
+            "type": 2
+          }
+        }
+      }
+    },
+    {
+      "id": 12,
+      "type": {
+        "def": {
+          "sequence": {
+            "type": 13
+          }
+        }
+      }
+    },
+    {
+      "id": 13,
+      "type": {
+        "def": {
+          "composite": {
+            "fields": [
+              {
+                "name": "draw_number",
+                "type": 4,
+                "typeName": "u32"
+              },
+              {
+                "name": "bettor",
+                "type": 0,
+                "typeName": "AccountId"
+              },
+              {
+                "name": "upline",
+                "type": 0,
+                "typeName": "AccountId"
+              },
+              {
+                "name": "bet_number",
+                "type": 5,
+                "typeName": "u16"
+              },
+              {
+                "name": "tx_hash",
+                "type": 11,
+                "typeName": "Vec<u8>"
+              },
+              {
+                "name": "bettor_share",
+                "type": 3,
+                "typeName": "u128"
+              },
+              {
+                "name": "upline_share",
+                "type": 3,
+                "typeName": "u128"
+              }
+            ]
+          }
+        },
+        "path": [
+          "lottery",
+          "lottery",
+          "Winner"
+        ]
+      }
+    },
+    {
+      "id": 14,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "index": 0,
+                "name": "Open"
+              },
+              {
+                "index": 1,
+                "name": "Processing"
+              },
+              {
+                "index": 2,
+                "name": "Close"
+              }
+            ]
+          }
+        },
+        "path": [
+          "lottery",
+          "lottery",
+          "DrawStatus"
+        ]
+      }
+    },
+    {
+      "id": 15,
+      "type": {
+        "def": {
+          "primitive": "u64"
+        }
+      }
+    },
+    {
+      "id": 16,
+      "type": {
+        "def": {
+          "composite": {
+            "fields": [
+              {
+                "name": "lottery_setup",
+                "type": 17,
+                "typeName": "<LotterySetup as::ink::storage::traits::AutoStorableHint<::ink::\nstorage::traits::ManualKey<2640414088u32, ()>,>>::Type"
+              },
+              {
+                "name": "draws",
+                "type": 7,
+                "typeName": "<Vec<Draw> as::ink::storage::traits::AutoStorableHint<::ink::\nstorage::traits::ManualKey<2242796769u32, ()>,>>::Type"
+              },
+              {
+                "name": "salt",
+                "type": 15,
+                "typeName": "<u64 as::ink::storage::traits::AutoStorableHint<::ink::storage\n::traits::ManualKey<1320505847u32, ()>,>>::Type"
+              }
+            ]
+          }
+        },
+        "path": [
+          "lottery",
+          "lottery",
+          "Lottery"
+        ]
+      }
+    },
+    {
+      "id": 17,
+      "type": {
+        "def": {
+          "composite": {
+            "fields": [
+              {
+                "name": "operator",
+                "type": 0,
+                "typeName": "AccountId"
+              },
+              {
+                "name": "dev",
+                "type": 0,
+                "typeName": "AccountId"
+              },
+              {
+                "name": "asset_id",
+                "type": 3,
+                "typeName": "u128"
+              },
+              {
+                "name": "starting_block",
+                "type": 4,
+                "typeName": "u32"
+              },
+              {
+                "name": "daily_total_blocks",
+                "type": 4,
+                "typeName": "u32"
+              },
+              {
+                "name": "next_starting_block",
+                "type": 4,
+                "typeName": "u32"
+              },
+              {
+                "name": "maximum_draws",
+                "type": 2,
+                "typeName": "u8"
+              },
+              {
+                "name": "maximum_bets",
+                "type": 5,
+                "typeName": "u16"
+              },
+              {
+                "name": "is_started",
+                "type": 6,
+                "typeName": "bool"
+              }
+            ]
+          }
+        },
+        "path": [
+          "lottery",
+          "lottery",
+          "LotterySetup"
+        ]
+      }
+    },
+    {
+      "id": 18,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 19
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 20
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 19
+          },
+          {
+            "name": "E",
+            "type": 20
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 19,
+      "type": {
+        "def": {
+          "tuple": []
+        }
+      }
+    },
+    {
+      "id": 20,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "index": 1,
+                "name": "CouldNotReadInput"
+              }
+            ]
+          }
+        },
+        "path": [
+          "ink_primitives",
+          "LangError"
+        ]
+      }
+    },
+    {
+      "id": 21,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 22
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 20
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 22
+          },
+          {
+            "name": "E",
+            "type": 20
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 22,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 19
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 23
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 19
+          },
+          {
+            "name": "E",
+            "type": 23
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 23,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "index": 0,
+                "name": "AlreadyStarted"
+              },
+              {
+                "index": 1,
+                "name": "InvalidBlock"
+              },
+              {
+                "index": 2,
+                "name": "NoRecords"
+              },
+              {
+                "index": 3,
+                "name": "BadOrigin"
+              },
+              {
+                "index": 4,
+                "name": "TooManyDraws"
+              },
+              {
+                "index": 5,
+                "name": "DrawNotFound"
+              },
+              {
+                "index": 6,
+                "name": "DrawClosed"
+              },
+              {
+                "index": 7,
+                "name": "DrawOpen"
+              },
+              {
+                "index": 8,
+                "name": "DrawProcessing"
+              },
+              {
+                "index": 9,
+                "name": "DrawNotProcessing"
+              },
+              {
+                "index": 10,
+                "name": "InvalidBetAmount"
+              },
+              {
+                "index": 11,
+                "name": "InvalidBlocksHierarchy"
+              }
+            ]
+          }
+        },
+        "path": [
+          "lottery",
+          "errors",
+          "Error"
+        ]
+      }
+    },
+    {
+      "id": 24,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 25
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 20
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 25
+          },
+          {
+            "name": "E",
+            "type": 20
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 25,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 19
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 26
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 19
+          },
+          {
+            "name": "E",
+            "type": 26
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 26,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 23,
+                    "typeName": "Error"
+                  }
+                ],
+                "index": 0,
+                "name": "Internal"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 27,
+                    "typeName": "RuntimeError"
+                  }
+                ],
+                "index": 1,
+                "name": "Runtime"
+              }
+            ]
+          }
+        },
+        "path": [
+          "lottery",
+          "errors",
+          "ContractError"
+        ]
+      }
+    },
+    {
+      "id": 27,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "index": 0,
+                "name": "CallRuntimeFailed"
+              }
+            ]
+          }
+        },
+        "path": [
+          "lottery",
+          "errors",
+          "RuntimeError"
+        ]
+      }
+    },
+    {
+      "id": 28,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 17
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 20
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 17
+          },
+          {
+            "name": "E",
+            "type": 20
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 29,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 7
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 20
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 7
+          },
+          {
+            "name": "E",
+            "type": 20
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 30,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 9
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 20
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 9
+          },
+          {
+            "name": "E",
+            "type": 20
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 31,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 32,
+                    "typeName": "Success"
+                  }
+                ],
+                "index": 0,
+                "name": "EmitSuccess"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 23,
+                    "typeName": "Error"
+                  }
+                ],
+                "index": 1,
+                "name": "EmitError"
+              }
+            ]
+          }
+        },
+        "path": [
+          "lottery",
+          "lottery",
+          "LotteryStatus"
+        ]
+      }
+    },
+    {
+      "id": 32,
+      "type": {
+        "def": {
+          "variant": {
+            "variants": [
+              {
+                "index": 0,
+                "name": "LotterySetup"
+              },
+              {
+                "index": 1,
+                "name": "LotteryStarted"
+              },
+              {
+                "index": 2,
+                "name": "LotteryStopped"
+              },
+              {
+                "index": 3,
+                "name": "DrawAdded"
+              },
+              {
+                "index": 4,
+                "name": "DrawRemoved"
+              },
+              {
+                "index": 5,
+                "name": "DrawOpened"
+              },
+              {
+                "index": 6,
+                "name": "DrawProcessed"
+              },
+              {
+                "index": 7,
+                "name": "DrawClosed"
+              },
+              {
+                "index": 8,
+                "name": "BetAdded"
+              }
+            ]
+          }
+        },
+        "path": [
+          "lottery",
+          "lottery",
+          "Success"
+        ]
+      }
+    },
+    {
+      "id": 33,
+      "type": {
+        "def": {
+          "composite": {
+            "fields": [
+              {
+                "type": 1,
+                "typeName": "[u8; 32]"
+              }
+            ]
+          }
+        },
+        "path": [
+          "ink_primitives",
+          "types",
+          "Hash"
+        ]
+      }
+    },
+    {
+      "id": 34,
+      "type": {
+        "def": {
+          "variant": {}
+        },
+        "path": [
+          "ink_env",
+          "types",
+          "NoChainExtension"
+        ]
+      }
+    }
+  ],
+  "version": 5
+}
