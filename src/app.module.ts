@@ -10,6 +10,7 @@ import { DrawsModule } from './app/draws/draws.module';
 import { BetsModule } from './app/bets/bets.module';
 import { PolkadotjsModule } from './app/polkadotjs/polkadotjs.module';
 import { ExecuteJobsModule } from './app/execute-jobs/execute-jobs.module';
+import { MembersModule } from './app/members/members.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { ExecuteJobsModule } from './app/execute-jobs/execute-jobs.module';
     BetsModule,
     ExecuteJobsModule,
     PolkadotjsModule,
+    MembersModule,
   ],
   controllers: [
     AppController
