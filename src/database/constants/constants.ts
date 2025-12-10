@@ -1,0 +1,1 @@
+export const MEMBERS_MODEL = 'MEMBERS_MODEL'
