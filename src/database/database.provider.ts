@@ -4,6 +4,6 @@ export const databaseProviders = [
   {
     provide: 'DATABASE_CONNECTION',
     useFactory: (): Promise<typeof mongoose> =>
-      mongoose.connect('mongodb://localhost/web3-lottery-db'),
+      mongoose.connect(process.env.DATABASE_URI || ''),
   },
 ];
