@@ -12,9 +12,21 @@ export class MembersService {
     private membersModel: Model<Member>
   ) {}
 
-  create(createMemberDto: CreateMemberDto): Promise<Member> {
-    const createdMember = new this.membersModel(createMemberDto)
-    return createdMember.save()
-  }
+   async create(
+    createMemberDto: CreateMemberDto,
+  ): Promise<{ message: string; data: Member }> {
+    
+    const existing = await this.membersModel.findOne({
+      member_address: createMemberDto.member_address,
+    });
 
+    if (existing) {
+      return { message: 'Member is already registered', data: existing };
+    }
+
+    const createdMember = new this.membersModel(createMemberDto);
+    const saved = await createdMember.save();
+
+    return { message: 'Member created successfully', data: saved };
+  }
 }
