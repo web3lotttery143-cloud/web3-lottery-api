@@ -4,6 +4,7 @@ import { UpdateMemberDto } from './dto/update-member.dto';
 import { MEMBERS_MODEL } from 'src/database/constants/constants';
 import { Member } from './entities/member.entity';
 import { Model } from 'mongoose';
+import { HttpStatus, NotFoundException, ConflictException } from '@nestjs/common';
 
 @Injectable()
 export class MembersService {
@@ -12,24 +13,34 @@ export class MembersService {
     private membersModel: Model<Member>,
   ) {}
 
-  async create(
-    createMemberDto: CreateMemberDto,
-  ): Promise<{ message: string; data: Member }> {
-    try {
-      const existing = await this.membersModel.findOne({
+  async create(createMemberDto: CreateMemberDto) {
+    const existing = await this.membersModel.findOne({
         member_address: createMemberDto.member_address,
+    });
+
+    if (existing) {
+        throw new ConflictException('Member is already registered');
+    }
+
+    const createdMember = new this.membersModel(createMemberDto);
+    const saved = await createdMember.save();
+
+    return {
+        message: 'Member registered successfully',
+        data: saved,
+    };
+}
+
+  async loginMember(dto: CreateMemberDto) {
+      const member = await this.membersModel.findOne({
+        member_address: dto.member_address,
       });
 
-      if (existing) {
-        return { message: 'Member is already registered', data: existing };
+      if (member == null) {
+        throw new NotFoundException('No existing record of wallet, please register first!');
       }
 
-      const createdMember = new this.membersModel(createMemberDto);
-      const saved = await createdMember.save();
-
-      return { message: 'Member created successfully', data: saved };
-    } catch (error) {
-      return error;
-    }
+      return { message: 'Login successful', statusCode: HttpStatus.OK, data: member };
+    
   }
 }
