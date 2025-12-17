@@ -48,7 +48,7 @@ export class BetsService {
         const extrinsic = api.createType('Extrinsic', executeBetDto.signed_hex);
         await api.tx(extrinsic).send(async (sendAssetResults: ISubmittableResult) => {
           if (sendAssetResults.isFinalized) {
-            const txHashHex = sendAssetResults.status.asInBlock.toHex();
+            const txHashHex = sendAssetResults.status.asFinalized.toHex();
 
             const keyring = new Keyring({ type: "sr25519" });
             const operatorsMnemonicSeeds = keyring.addFromUri(this.OPERATORS_MNEMONIC_SEEDS);
