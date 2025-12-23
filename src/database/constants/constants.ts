@@ -1,1 +1,2 @@
 export const MEMBERS_MODEL = 'MEMBERS_MODEL'
+export const MEMBER_BETS_MODEL = 'MEMBER_BETS_MODEL'
