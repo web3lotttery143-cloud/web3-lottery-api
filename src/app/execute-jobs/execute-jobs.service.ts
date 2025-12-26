@@ -19,25 +19,40 @@ export class ExecuteJobsService implements OnModuleInit, OnModuleDestroy {
   private unsubscribeNewHeads: (() => void) | null = null;
   private isProcessingBlock = false;
 
-  @Cron('0 0 5 * * *') // Start at 5:00 AM
+   @Cron('0 0 5 * * *') // Start at 5:00 AM
   async startLotterySubscription() {
     if (this.unsubscribeNewHeads) {
       this.logger.warn('Lottery subscription already running.');
       return;
     }
 
-    this.logger.log('Starting lottery block subscription (6 PM)');
+    this.logger.log('Starting lottery block subscription (5 AM)');
     await this.startBlockSubscription();
   }
 
   @Cron('0 0 0 * * *') // Stop at 12:00 AM
-  stopLotterySubscription() {
+  async stopLotterySubscription() {
     if (!this.unsubscribeNewHeads) {
       this.logger.warn('No active lottery subscription to stop.');
       return;
     }
 
     this.logger.log('Stopping lottery block subscription (12 AM)');
+
+    const api = await this.polkadotJsService.connect();
+
+    const contract = this.polkadotJsService.initContract(api);
+    const gasLimit = this.polkadotJsService.createGasLimit(api);
+
+    const keyring = new Keyring({ type: "sr25519" });
+    const operatorsMnemonicSeeds = keyring.addFromUri(this.OPERATORS_MNEMONIC_SEEDS);
+
+    contract.tx['stop']({ gasLimit, storageDepositLimit: null })
+      .signAndSend(operatorsMnemonicSeeds, (result) => {
+        Logger.log(`Stop Lottery status: ${ result.status.toString() }`);
+      }).catch((error) => {
+        Logger.error(`Failed to stop lottery: ${ error.message }`);
+      });
 
     this.unsubscribeNewHeads();
     this.unsubscribeNewHeads = null;
