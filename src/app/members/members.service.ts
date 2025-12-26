@@ -53,17 +53,20 @@ export class MembersService {
     
   }
 
-   async getMemberBets(member_address: string) {
-      const memberBets = await this.memberBetsModel.findOne({
-        member_address,
-      });
+  async getMemberBets(member_address: string) {
+    const memberBets = await this.memberBetsModel.findOne(
+      { member_address },
+      { bets: { $slice: -20 } },
+    );
 
-      if (!memberBets) {
-        throw new NotFoundException('Member bets not found');
-      }
-
-      return memberBets;
+    if (!memberBets) {
+      throw new NotFoundException('Member bets not found');
     }
+
+    memberBets.bets.reverse();
+
+    return memberBets;
+   }
 
 
     async createMemberBet(dto: CreateMemberBetDto) {
