@@ -56,7 +56,6 @@ export class MembersService {
   async getMemberBets(member_address: string) {
     const memberBets = await this.memberBetsModel.findOne(
       { member_address },
-      { bets: { $slice: -20 } },
     );
 
     if (!memberBets) {
