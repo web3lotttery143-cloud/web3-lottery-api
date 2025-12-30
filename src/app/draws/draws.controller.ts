@@ -1,6 +1,6 @@
 import { Body, Controller, Post, Get, HttpException, HttpStatus } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-
+import { ExecuteDrawDto } from './dto/execute-draw.dto';
 import { DrawsService } from './draws.service';
 import { PolkadotjsService } from './../polkadotjs/polkadotjs.service';
 
@@ -44,6 +44,23 @@ export class DrawsController {
         {
           statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
           message: 'Failed to override draw',
+          error: error instanceof Error ? error.message : new Error(String(error)).message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Post('execute')
+  async executeDraw(@Body() executeDrawDto: ExecuteDrawDto) {
+    try {
+      const api = await this.polkadotJsService.connect();
+      return await this.drawsService.executeDraw(api, executeDrawDto);
+    } catch (error) {
+      throw new HttpException(
+        {
+          statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: 'Failed to execute draw',
           error: error instanceof Error ? error.message : new Error(String(error)).message,
         },
         HttpStatus.INTERNAL_SERVER_ERROR,

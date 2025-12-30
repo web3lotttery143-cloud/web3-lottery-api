@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
-
+import { ExecuteDrawDto } from './dto/execute-draw.dto';
 import { ApiPromise } from '@polkadot/api';
-
 import { PolkadotjsService } from '../polkadotjs/polkadotjs.service';
 import { AddDrawDto } from './dto/add-draw.dto';
 import { OpenDrawDto } from './dto/open-draw.dto';
@@ -108,5 +107,26 @@ export class DrawsService {
     );
 
     return JSON.stringify(contractQuery.output?.toHuman());
+  }
+
+  async executeDraw(api: ApiPromise, executeDrawDto: ExecuteDrawDto): Promise<string> {
+    this.polkadotJsService.validateConnection(api);
+
+    return new Promise((resolve, reject) => {
+      (async () => {
+        const extrinsic = api.createType('Extrinsic', executeDrawDto.signed_hex);
+        await api.tx(extrinsic).send(executeDrawResults => {
+          if (executeDrawResults.isFinalized) {
+            resolve(executeDrawResults.status.asFinalized.toHex().toString());
+          }
+
+          if (executeDrawResults.isError) {
+            reject(new Error(executeDrawResults.status.toString()));
+          }
+        }).catch((error) => {
+          reject(new Error(error));
+        });
+      })();
+    });
   }
 }
