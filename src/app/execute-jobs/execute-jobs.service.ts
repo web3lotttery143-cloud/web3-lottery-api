@@ -74,7 +74,7 @@ export class ExecuteJobsService {
         const currentBlock = block.block.header.number.toNumber();
 
         const keyring = new Keyring({ type: "sr25519" });
-        const operatorsMnemonicSeeds = keyring.addFromUri(this.OPERATORS_MNEMONIC_SEEDS);
+        const operatorsMnemonicSeeds = keyring.addFromMnemonic(this.OPERATORS_MNEMONIC_SEEDS);
 
         const contract = this.polkadotJsService.initContract(this.pjsApi);
         const gasLimit = this.polkadotJsService.createGasLimit(this.pjsApi);

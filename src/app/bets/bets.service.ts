@@ -3,10 +3,10 @@ import { Injectable } from '@nestjs/common';
 import { ApiPromise } from '@polkadot/api';
 import { Keyring } from '@polkadot/keyring';
 import { SubmittableExtrinsic } from '@polkadot/api/types';
+import { ISubmittableResult } from '@polkadot/types/types';
 
 import { PolkadotjsService } from './../polkadotjs/polkadotjs.service';
 import { ExecuteBetDto } from './dto/execute-bet.dto';
-import { ISubmittableResult } from '@polkadot/types/types';
 
 @Injectable()
 export class BetsService {
@@ -19,7 +19,6 @@ export class BetsService {
   OPERATORS_MNEMONIC_SEEDS = process.env.OPERATORS_MNEMONIC_SEEDS || '';
 
   addBet(api: ApiPromise): SubmittableExtrinsic<'promise', ISubmittableResult> {
-    this.polkadotJsService.validateConnection(api);
     this.polkadotJsService.validateConnection(api);
 
     const contractAddress = this.polkadotJsService.contractAddress;
@@ -51,7 +50,7 @@ export class BetsService {
             const txHashHex = sendAssetResults.status.asFinalized.toHex();
 
             const keyring = new Keyring({ type: "sr25519" });
-            const operatorsMnemonicSeeds = keyring.addFromUri(this.OPERATORS_MNEMONIC_SEEDS);
+            const operatorsMnemonicSeeds = keyring.addFromMnemonic(this.OPERATORS_MNEMONIC_SEEDS);
 
             const contract = this.polkadotJsService.initContract(api);
             const gasLimit = this.polkadotJsService.createGasLimit(api);
