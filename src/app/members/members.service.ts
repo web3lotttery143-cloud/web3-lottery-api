@@ -21,7 +21,7 @@ export class MembersService {
     });
 
     if (existing) {
-        throw new ConflictException('Member is already registered');
+        return { message: 'Login successful', statusCode: HttpStatus.OK, data: existing };
     }
 
     const createdMember = new this.membersModel(createMemberDto);
