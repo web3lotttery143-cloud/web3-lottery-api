@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger, InternalServerErrorException, ServiceUnavailableException } from '@nestjs/common';
 
 import metadata from './../../../contract/lottery.json';
 
@@ -9,15 +9,32 @@ import { WeightV2 } from '@polkadot/types/interfaces';
 
 @Injectable()
 export class PolkadotjsService {
+  private readonly logger = new Logger(PolkadotjsService.name);
+  
   contractAddress = process.env.CONTRACT_ADDRESS || '';
 
   async connect(): Promise<ApiPromise> {
-    await cryptoWaitReady();
+    try {
+      await cryptoWaitReady();
 
-    const wsProvider = new WsProvider(process.env.WS_PROVIDER || '');
-    const api = await ApiPromise.create({ provider: wsProvider });
+      const wsUrl = process.env.WS_PROVIDER;
+      if (!wsUrl) {
+        throw new InternalServerErrorException('WS_PROVIDER environment variable is not set');
+      }
 
-    return api;
+      this.logger.log(`Connecting to ${wsUrl}...`);
+      
+      const wsProvider = new WsProvider(wsUrl, 120_000);
+      const api = await ApiPromise.create({ provider: wsProvider });
+      await api.isReady;
+
+      return api;
+    } catch (error) {
+      this.logger.error('Failed to connect to Polkadot RPC endpoint:', error.message);
+      throw new ServiceUnavailableException(
+        `Unable to connect to Polkadot RPC endpoint: ${error.message}`
+      );
+    }
   }
 
   initContract(api: ApiPromise): ContractPromise {
@@ -33,7 +50,7 @@ export class PolkadotjsService {
 
   validateConnection(api: ApiPromise): void {
     if (!api.isConnected) {
-      throw new Error('API is not connected');
+      throw new ServiceUnavailableException('Polkadot API is not connected');
     }
   }
 }
