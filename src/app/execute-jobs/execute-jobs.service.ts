@@ -27,27 +27,27 @@ export class ExecuteJobsService {
     return `${str.slice(0, head)}...${str.slice(-tail)}`;
   }
 
-  @Cron('0 0 5 * * *') // Every day at 5:00 AM
-  startLotteryJob() {
-    if (this.isJobRunning) {
-      this.logger.log('Lottery job is already running.');
-      return;
-    }
+  // @Cron('0 0 5 * * *') // Every day at 5:00 AM
+  // startLotteryJob() {
+  //   if (this.isJobRunning) {
+  //     this.logger.log('Lottery job is already running.');
+  //     return;
+  //   }
 
-    this.logger.log('Starting lottery job');
-    this.isJobRunning = true;
-  }
+  //   this.logger.log('Starting lottery job');
+  //   this.isJobRunning = true;
+  // }
 
-  @Cron('0 0 0 * * *') // Every day at 12:00 AM
-  stopLotteryJob() {
-    if (!this.isJobRunning) {
-      this.logger.log('Lottery job is already stopped.');
-      return;
-    }
+  // @Cron('0 0 0 * * *') // Every day at 12:00 AM
+  // stopLotteryJob() {
+  //   if (!this.isJobRunning) {
+  //     this.logger.log('Lottery job is already stopped.');
+  //     return;
+  //   }
 
-    this.logger.log('Stopping lottery job');
-    this.isJobRunning = false;
-  }
+  //   this.logger.log('Stopping lottery job');
+  //   this.isJobRunning = false;
+  // }
 
   @Cron('*/10 * * * * *')
   async executeLotteryJob() {
