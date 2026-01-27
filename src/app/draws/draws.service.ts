@@ -178,17 +178,16 @@ export class DrawsService {
             const contract = this.polkadotJsService.initContract(api);
             const gasLimit = this.polkadotJsService.createGasLimit(api);
 
-            await contract.tx['addBet']({ gasLimit, storageDepositLimit: null },
+            await contract.tx['addDrawJackpot']({ gasLimit, storageDepositLimit: null },
               executeDrawJackpotDto.draw_number,
-              executeDrawJackpotDto.jackpot,
-              txHashHex
-            ).signAndSend(operatorsMnemonicSeeds, (addBetResults: ISubmittableResult) => {
-              if (addBetResults.isInBlock) {
-                resolve(addBetResults.status.asInBlock.toHex().toString());
+              executeDrawJackpotDto.jackpot
+            ).signAndSend(operatorsMnemonicSeeds, (addDrawJackpotResults: ISubmittableResult) => {
+              if (addDrawJackpotResults.isInBlock) {
+                resolve(addDrawJackpotResults.status.asInBlock.toHex().toString());
               }
 
-              if (addBetResults.isError) {
-                reject(new Error(addBetResults.status.toString()));
+              if (addDrawJackpotResults.isError) {
+                reject(new Error(addDrawJackpotResults.status.toString()));
               }
             }).catch((error) => {
               reject(new Error(error));
