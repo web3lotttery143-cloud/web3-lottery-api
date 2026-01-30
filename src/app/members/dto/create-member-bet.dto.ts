@@ -12,6 +12,9 @@ export class BetDto {
 
   @ApiProperty()
   draw_number: number;
+
+  @ApiProperty()
+  success: boolean;
 }
 
 export class CreateMemberBetDto {

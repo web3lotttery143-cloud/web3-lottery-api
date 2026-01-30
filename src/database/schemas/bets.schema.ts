@@ -7,6 +7,7 @@ export const BetSchema = new mongoose.Schema({
   transaction_hash: String,
   draw_number: String,
   date: { type: Date, default: Date.now },
+  success: { type: Boolean, default: false },
 })
 export const MemberBetsSchema = new mongoose.Schema({
   member_address: { type: String, required: true, unique: true },
