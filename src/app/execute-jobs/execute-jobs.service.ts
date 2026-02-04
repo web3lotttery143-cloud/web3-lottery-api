@@ -14,6 +14,7 @@ export class ExecuteJobsService {
   ) { }
 
   CONTRACT_ADDRESS = process.env.CONTRACT_ADDRESS || '';
+  DEVELOPERS_MNEMONIC_SEEDS = process.env.DEVELOPERS_MNEMONIC_SEEDS || '';
   OPERATORS_MNEMONIC_SEEDS = process.env.OPERATORS_MNEMONIC_SEEDS || '';
 
   private pjsApi: ApiPromise | null = null;
@@ -21,33 +22,13 @@ export class ExecuteJobsService {
   private isJobRunning = true;
   private isProcessingBlock = false;
 
+  private isLotterySetupProcessed = false;
+
   private truncateMiddle(str, head = 5, tail = 5) {
     if (typeof str !== 'string') return String(str ?? '');
     if (str.length <= head + tail + 3) return str;
     return `${str.slice(0, head)}...${str.slice(-tail)}`;
   }
-
-  // @Cron('0 0 5 * * *') // Every day at 5:00 AM
-  // startLotteryJob() {
-  //   if (this.isJobRunning) {
-  //     this.logger.log('Lottery job is already running.');
-  //     return;
-  //   }
-
-  //   this.logger.log('Starting lottery job');
-  //   this.isJobRunning = true;
-  // }
-
-  // @Cron('0 0 0 * * *') // Every day at 12:00 AM
-  // stopLotteryJob() {
-  //   if (!this.isJobRunning) {
-  //     this.logger.log('Lottery job is already stopped.');
-  //     return;
-  //   }
-
-  //   this.logger.log('Stopping lottery job');
-  //   this.isJobRunning = false;
-  // }
 
   @Cron('*/10 * * * * *')
   async executeLotteryJob() {
@@ -73,18 +54,57 @@ export class ExecuteJobsService {
         const block = await this.pjsApi.rpc.chain.getBlock();
         const currentBlock = block.block.header.number.toNumber();
 
-        const keyring = new Keyring({ type: "sr25519" });
+        const keyring = new Keyring({ type: "sr25519", ss58Format: 280 });
         const operatorsMnemonicSeeds = keyring.addFromMnemonic(this.OPERATORS_MNEMONIC_SEEDS);
 
         const contract = this.polkadotJsService.initContract(this.pjsApi);
         const gasLimit = this.polkadotJsService.createGasLimit(this.pjsApi);
 
-        const getLotterySetup = await contract.query['getLotterySetup'](
+        const now = new Date();
+
+        if (now.getHours() >= 5 && now.getHours() < 6 && !this.isLotterySetupProcessed) {
+          this.logger.log(`Block #${currentBlock} | Checking lottery setup at 5AM`);
+
+          const getLotterySetup = await contract.query['getLotterySetup'](
+            this.CONTRACT_ADDRESS, { gasLimit, storageDepositLimit: null }
+          );
+
+          if (getLotterySetup.output) {
+            const developersMnemonicSeeds = keyring.addFromMnemonic(this.DEVELOPERS_MNEMONIC_SEEDS);
+
+            const lottery = getLotterySetup.output.toJSON() as any;
+            const dailyTotalBlocks = Number(lottery.ok?.dailyTotalBlocks.toString().replace(/,/g, ''));
+            const maximumDraws = Number(lottery.ok?.maximumDraws.toString().replace(/,/g, ''));
+            const maximumBets = Number(lottery.ok?.maximumBets.toString().replace(/,/g, ''));
+
+            try {
+              const result = await contract.tx['setup']({ gasLimit, storageDepositLimit: null },
+                operatorsMnemonicSeeds.address,
+                1984,
+                currentBlock + 300,
+                dailyTotalBlocks,
+                maximumDraws,
+                maximumBets,
+              ).signAndSend(developersMnemonicSeeds);
+              this.logger.log(`Block #${currentBlock} | Setup Lottery status: ${result.toHex().toString()}`);
+
+              this.isLotterySetupProcessed = true;
+            } catch (error) {
+              this.logger.error(`Block #${currentBlock} | Failed to setup lottery: ${error.message}`);
+            }
+          }
+        }
+
+        if (now.getHours() >= 6) {
+          this.isLotterySetupProcessed = false;
+        }
+
+        const newLotterySetup = await contract.query['getLotterySetup'](
           this.CONTRACT_ADDRESS, { gasLimit, storageDepositLimit: null }
         );
 
-        if (getLotterySetup.output) {
-          const lottery = getLotterySetup.output.toJSON() as any;
+        if (newLotterySetup.output) {
+          const lottery = newLotterySetup.output.toJSON() as any;
           this.logger.log(`Block #${currentBlock} | Lottery ${this.truncateMiddle(this.CONTRACT_ADDRESS)} (${lottery.ok?.isStarted}): [${lottery.ok?.startingBlock}, ${lottery.ok?.nextStartingBlock}] O:${this.truncateMiddle(lottery.ok?.operator)}, D:${this.truncateMiddle(lottery.ok?.dev)}`);
 
           const startingBlock = Number(lottery.ok?.startingBlock.toString().replace(/,/g, ''));
