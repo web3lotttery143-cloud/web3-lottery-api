@@ -11,6 +11,7 @@ import { BetsModule } from './app/bets/bets.module';
 import { PolkadotjsModule } from './app/polkadotjs/polkadotjs.module';
 import { ExecuteJobsModule } from './app/execute-jobs/execute-jobs.module';
 import { MembersModule } from './app/members/members.module';
+import { AdminModule } from './app/admin/admin.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { MembersModule } from './app/members/members.module';
     ExecuteJobsModule,
     PolkadotjsModule,
     MembersModule,
+    AdminModule
   ],
   controllers: [
     AppController
