@@ -12,8 +12,7 @@ export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
  @Get('member-bets')
-  findBets(@Query() paginationQuery: PaginationQueryDto): Promise<PaginatedResult> {
-    return this.adminService.findBets(paginationQuery);
+  findBets() {
+    return this.adminService.findBets();
   }
 }
-
