@@ -81,7 +81,7 @@ export class ExecuteJobsService {
               const result = await contract.tx['setup']({ gasLimit, storageDepositLimit: null },
                 operatorsMnemonicSeeds.address,
                 1984,
-                currentBlock + 300,
+                currentBlock + 600,
                 dailyTotalBlocks,
                 maximumDraws,
                 maximumBets,
@@ -118,9 +118,9 @@ export class ExecuteJobsService {
             const draws = getDraws.output.toJSON() as any;
 
             draws.ok?.map(async (d: any) => {
-              const openingBlocks = Number(d.openingBlocks.toString().replace(/,/g, '')) + startingBlock;
-              const processingBlocks = Number(d.processingBlocks.toString().replace(/,/g, '')) + startingBlock;
-              const closingBlocks = Number(d.closingBlocks.toString().replace(/,/g, '')) + startingBlock;
+              const openingBlocks = (Number(d.openingBlocks.toString().replace(/,/g, '')) * 2) + startingBlock;
+              const processingBlocks = (Number(d.processingBlocks.toString().replace(/,/g, '')) * 2) + startingBlock;
+              const closingBlocks = (Number(d.closingBlocks.toString().replace(/,/g, '')) * 2) + startingBlock;
 
               if (!d.isOpen && d.status == "Close" && currentBlock >= openingBlocks) {
                 if (currentBlock < closingBlocks) {
