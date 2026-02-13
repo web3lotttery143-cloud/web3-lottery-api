@@ -10,21 +10,22 @@ import { WeightV2 } from '@polkadot/types/interfaces';
 @Injectable()
 export class PolkadotjsService {
   private readonly logger = new Logger(PolkadotjsService.name);
-  
+
   contractAddress = process.env.CONTRACT_ADDRESS || '';
 
   async connect(): Promise<ApiPromise> {
     try {
       await cryptoWaitReady();
 
-      const wsUrl = process.env.WS_PROVIDER;
-      if (!wsUrl) {
-        throw new InternalServerErrorException('WS_PROVIDER environment variable is not set');
+      const wsUrls = process.env.WS_PROVIDERS;
+      if (!wsUrls) {
+        throw new InternalServerErrorException('WS_PROVIDERS environment variable is not set');
       }
 
-      this.logger.log(`Connecting to ${wsUrl}...`);
-      
-      const wsProvider = new WsProvider(wsUrl, 120_000);
+      const providers = wsUrls.split(',').map(url => url.trim()).filter(Boolean);
+      this.logger.log(`Connecting to providers: ${providers.join(', ')}`);
+
+      const wsProvider = new WsProvider(providers, 30_000);
       const api = await ApiPromise.create({ provider: wsProvider });
       await api.isReady;
 

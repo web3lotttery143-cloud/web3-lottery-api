@@ -30,7 +30,7 @@ export class ExecuteJobsService {
     return `${str.slice(0, head)}...${str.slice(-tail)}`;
   }
 
-  @Cron('*/10 * * * * *')
+  @Cron('0 */15 * * * *')
   async executeLotteryJob() {
     try {
       if (!this.isJobRunning) {
